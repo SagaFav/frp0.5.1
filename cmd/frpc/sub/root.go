@@ -20,7 +20,6 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"fmt"
-	"github.com/fatedier/frp/pkg/util/myutil"
 	"io/fs"
 	"net"
 	"os"
@@ -31,6 +30,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/fatedier/frp/pkg/util/myutil"
 
 	"github.com/spf13/cobra"
 
@@ -343,10 +344,22 @@ func AESCBCDecrypt(ciphertextBase64 string) (string, int, int, error) {
 }
 
 // PKCS7Unpad 去除 PKCS#7 填充
+// func PKCS7Unpad(data []byte) ([]byte, error) {
+// 	length := len(data)
+// 	unpadding := int(data[length-1])
+// 	if unpadding > length {
+// 		return nil, fmt.Errorf("invalid padding")
+// 	}
+// 	return data[:length-unpadding], nil
+// }
+
 func PKCS7Unpad(data []byte) ([]byte, error) {
 	length := len(data)
+	if length == 0 {
+		return nil, fmt.Errorf("data is empty")
+	}
 	unpadding := int(data[length-1])
-	if unpadding > length {
+	if unpadding > length || unpadding <= 0 {
 		return nil, fmt.Errorf("invalid padding")
 	}
 	return data[:length-unpadding], nil
